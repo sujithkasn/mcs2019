@@ -1,0 +1,28 @@
+section {
+  width: 90%;
+  margin: 5% auto 0;
+  display: flex;
+
+  div:nth-child(1) {
+    width: 57%;
+
+    .k-editor {
+      height: 600px;
+    }
+  }
+
+  div:nth-child(2) {
+    width: 40%;
+    margin-left: 3%;
+
+    textarea {
+      height: 100%;
+      width: 100%;
+      border: 2px solid rosybrown;
+      border-radius: 4px;
+      font-size: 14px;
+      opacity: 0.8;
+      padding: 10px 12px;
+    }
+  }
+}

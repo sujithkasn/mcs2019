@@ -1,0 +1,64 @@
+<ng-container *ngIf="displayDataExtraction">
+
+  <h5 class="card-header">Data Extraction Form</h5>
+  <div class="card-body">
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label>URL</label>
+        <input kendoTextBox formControlName="url" class="form-control"
+          [ngClass]="{ 'ng-invalid ng-touched': submitted && f.url.errors }" />
+        <div *ngIf="submitted && f.url.errors" class="k-tooltip-validation">
+          <div *ngIf="f.url.errors.required">URL is required</div>
+
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Extractor</label>
+        <kendo-dropdownlist formControlName="extractor" [data]="extractors" class="form-control"
+          [ngClass]="{ 'ng-invalid ng-touched': submitted && f.extractor.errors }">
+        </kendo-dropdownlist>
+        <div *ngIf="submitted && f.extractor.errors" class="k-tooltip-validation">
+          <div *ngIf="f.extractor.errors.required">Extractor is required</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Output Format</label>
+        <kendo-dropdownlist formControlName="outputFormat" [data]="outputFormats" class="form-control"
+          [ngClass]="{ 'ng-invalid ng-touched': submitted && f.outputFormat.errors }">
+        </kendo-dropdownlist>
+        <div *ngIf="submitted && f.outputFormat.errors" class="k-tooltip-validation">
+          <div *ngIf="f.outputFormat.errors.required">Output Format is required</div>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <button kendoButton primary="true">Extract</button>
+      </div>
+    </form>
+  </div>
+
+</ng-container>
+
+
+<ng-container *ngIf="displayEditor">
+  <section>
+    <div>
+      <kendo-editor (valueChange)="valueChange($event)" [value]="value" cols="30"></kendo-editor>
+      <button (click)="onClickBack()">Back</button>
+    </div>
+    <div>
+      <textarea name="editorOutput" id="" cols="30" rows="10" [innerHTML]="value"></textarea>
+      <button (click)="onClickCreateCourse()">Create Course</button>
+    </div>
+  </section>
+</ng-container>
+
+<ng-container *ngIf="displaySuccessTranfer">
+  <section>
+    <div>
+      <p>Course Successfull Creted...!!!</p>
+    </div>
+  </section>
+</ng-container>
