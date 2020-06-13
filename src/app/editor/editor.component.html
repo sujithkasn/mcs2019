@@ -9,7 +9,16 @@
           [ngClass]="{ 'ng-invalid ng-touched': submitted && f.url.errors }" />
         <div *ngIf="submitted && f.url.errors" class="k-tooltip-validation">
           <div *ngIf="f.url.errors.required">URL is required</div>
+        </div>
+      </div>
 
+      <div class="form-group">
+        <label>Library</label>
+        <kendo-dropdownlist formControlName="library" [data]="libraries" class="form-control"
+          [ngClass]="{ 'ng-invalid ng-touched': submitted && f.library.errors }" (valueChange)="onLibraryChange()">
+        </kendo-dropdownlist>
+        <div *ngIf="submitted && f.library.errors" class="k-tooltip-validation">
+          <div *ngIf="f.library.errors.required">Library is required</div>
         </div>
       </div>
 
@@ -38,19 +47,32 @@
       </div>
     </form>
   </div>
-
 </ng-container>
-
 
 <ng-container *ngIf="displayEditor">
   <section>
     <div>
-      <kendo-editor (valueChange)="valueChange($event)" [value]="value" cols="30"></kendo-editor>
-      <button (click)="onClickBack()">Back</button>
+      <label>Title: </label>
+      <input kendoTextBox name="title" width="100%"/>
+    </div>
+  </section>
+</ng-container>
+
+<ng-container *ngIf="displayEditor">
+  <section>
+    <div>
+      <kendo-editor (valueChange)="valueChange($event)" [value]="content" cols="30"></kendo-editor>
+      <button kendoButton primary="true" class="back-btn" (click)="onClickBack(0)">Back</button>
     </div>
     <div>
-      <textarea name="editorOutput" id="" cols="30" rows="10" [innerHTML]="value"></textarea>
-      <button (click)="onClickCreateCourse()">Create Course</button>
+      <textarea name="editorOutput" id="" cols="30" rows="10" [innerHTML]="content"></textarea>
+      <div style="width: 100%;">
+        <button kendoButton primary="true" (click)="onClickCreateCourse()">Create Course</button>
+        &nbsp;
+        <button kendoButton primary="true" (click)="onClickAddDiscussion()">Create Forum Discussion</button>
+        &nbsp;
+        <button kendoButton primary="true" (click)="onClickAddDiscussionPost()">Add Discussion Post</button>
+      </div>
     </div>
   </section>
 </ng-container>
@@ -58,7 +80,26 @@
 <ng-container *ngIf="displaySuccessTranfer">
   <section>
     <div>
-      <p>Course Successfull Creted...!!!</p>
+      <div *ngIf="tranferError == ''">
+        <h3>Course Successfully Created...!</h3>
+        <h4>Details:</h4>
+        <p>{{transferMessage}}</p>
+      </div>
+
+      <div *ngIf="tranferError != ''">
+        <h3>Error in Course creation...!!!</h3>
+        <h4>Detailed Error:</h4>
+        <p>{{transferMessage}}</p>
+      </div>
+
+      <div>
+        <div>
+          <button kendoButton primary="true" (click)="onClickBack(1)">Back</button>
+          &nbsp;
+          <button kendoButton primary="true" (click)="onClickBack(0)">Home</button>
+        </div>
+      </div>
     </div>
   </section>
+
 </ng-container>

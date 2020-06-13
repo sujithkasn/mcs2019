@@ -13,6 +13,7 @@ export const environment = {
   moodleWsFuncForumAddDiscussionPost: 'mod_forum_add_discussion_post',
   moodleWsCourseCategoryId: 13,
   moodleWsForumId: 8,
+  moodleWsDiscussionId: 16,
 };
 
 /*

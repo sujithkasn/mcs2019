@@ -14,36 +14,40 @@ export class EditorComponent implements OnInit {
 
   registerForm: FormGroup;
   submitted = false;
-  extractors = ['', 'Keep Everything Extractor', 'Article Extractor', 'Largest Content Extractor', 'Default Extractor'];
-  outputFormats = ['', 'HTML', 'HTML Fragment', 'Text', 'JSON']
+  libraries = ['', 'Boilerpipe', 'BoilerPy3', 'BeautifulSoup'];
+  beautifulSoupExtractors = ['N/A'];
+  boilerpipeExtractors = ['', 'Default Extractor', 'Article Extractor', 'Largest Content Extractor', 'Keep Everything Extractor'];
+  boilerPy3Extractors = ['', 'Default Extractor', 'Article Extractor', 'Article Sentences Extractor', 'Largest Content Extractor', 'Canola Extractor', 'Keep Everything Extractor', 'Num Words Rules Extractor'];
+  outputFormats = ['', 'HTML', 'HTML Fragment', 'Text', 'JSON'];
 
-  value = '';
+  extractors = this.boilerpipeExtractors;
+
+  title = '';
+  content = '';
   displayDataExtraction = true;
   displayEditor = false;
   displaySuccessTranfer = false;
+  tranferError = '';
+  transferMessage = '';
 
   url = "";
+  library = "";
   extractor = "";
   outputFormat = "";
 
   constructor(private formBuilder: FormBuilder) { }
 
   valueChange(e: string) {
-    this.value = e;
+    this.content = e;
   }
 
   ngOnInit() {
     this.registerForm = this.formBuilder.group({
       url: ['https://theinnovativeeducator.blogspot.com/2018/05/8-tips-for-quality-posts-during.html', [Validators.required]],
+      library: ['Boilerpipe', Validators.required],
       extractor: ['Default Extractor', Validators.required],
       outputFormat: ['JSON', Validators.required],
     });
-  }
-
-  onClickBack() {
-    this.displayDataExtraction = true;
-    this.displayEditor = false;
-    this.displaySuccessTranfer = false;
   }
 
   // convenience getter for easy access to form fields
@@ -84,6 +88,32 @@ export class EditorComponent implements OnInit {
     return response.json(); // parses JSON response into native JavaScript objects
   }
 
+  onLibraryChange() {
+    switch (this.registerForm.controls['library'].value) {
+      case 'Boilerpipe':
+        this.extractors = this.boilerpipeExtractors;
+        this.registerForm.controls['extractor'].setValue(this.extractors[1]);
+        break;
+
+      case 'BoilerPy3':
+        this.extractors = this.boilerPy3Extractors;
+        this.registerForm.controls['extractor'].setValue(this.extractors[1]);
+        break;
+
+      case 'BeautifulSoup':
+        this.extractors = this.beautifulSoupExtractors;
+        this.registerForm.controls['extractor'].setValue(this.extractors[0]);
+        break;
+
+      case '':
+        this.extractors = [];
+        break;
+
+      default:
+        break;
+    }
+  }
+
 
   onSubmit() {
     this.submitted = true;
@@ -94,35 +124,52 @@ export class EditorComponent implements OnInit {
     }
 
     this.url = this.registerForm.controls['url'].value;
+    this.library = this.registerForm.controls['library'].value;
     this.extractor = this.registerForm.controls['extractor'].value;
     this.outputFormat = this.registerForm.controls['outputFormat'].value;
 
     this.postData(environment.extractorEndPoint, {
       "url": this.url,
+      "library": this.library,
       "extractor": this.extractor,
       "outputformat": this.outputFormat
     }).then(res => {
-      this.value = res.title + "/n" + res.extractedContent;
+      this.title = res.title;
+      this.content = res.content;
       this.displayEditor = true;
       this.displayDataExtraction = false;
       this.displaySuccessTranfer = false;
     })
   }
 
+  onClickBack(step: number) {
+    if (step == 0) {
+      this.displayDataExtraction = true;
+      this.displayEditor = false;
+      this.displaySuccessTranfer = false;
+      this.transferMessage = '';
+    } else if (step == 1) {
+      this.displayDataExtraction = false;
+      this.displayEditor = true;
+      this.displaySuccessTranfer = false;
+      this.transferMessage = '';
+    }
+  }
+
   onClickCreateCourse() {
-    let courseName = ""
-    let courseShortName = ""
-    let courseIdNumber = 2
+    let courseName = "DEMO 4"
+    let courseShortName = "DEMO 4 Short"
+    let courseIdNumber = 7
     this.createCourse(courseName, courseShortName, environment.moodleWsCourseCategoryId, courseIdNumber);
   }
 
-  // onClickAddDiscussion() {
-  //   this.crea
-  // }
+  onClickAddDiscussion() {
+    this.addDiscussion();
+  }
 
-  // onClickAddDiscussionPost() {
-  //   this.crea
-  // }
+  onClickAddDiscussionPost() {
+    this.addDiscussionPost();
+  }
 
   // onClickAddNewWikiPage() {
 
@@ -140,27 +187,65 @@ export class EditorComponent implements OnInit {
     apiCallUrl = Url.addParam(apiCallUrl, "wstoken", environment.moodleWsToken);
     apiCallUrl = Url.addParam(apiCallUrl, "wsfunction", environment.moodleWsFuncCreateCourse);
     apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
-    console.log("apiCallUrl", apiCallUrl);
-    debugger
 
     this.postDataParams(apiCallUrl).then(res => {
-      console.log("apiCallUrl", apiCallUrl);
+      if (res.exception) {
+        this.tranferError = res.message;
+        this.transferMessage = res.exception + ' - ' + res.errorcode + ' - ' + res.message;
+      }
+      else if (res[0]) {
+        this.tranferError = ''
+        this.transferMessage = 'New Course: ' + res[0].id + ' with Short name ' + res[0].shortname + 'has been successfully created...!';
+      }
       this.displaySuccessTranfer = true;
       this.displayEditor = false;
       this.displayDataExtraction = false;
     })
-
   }
 
   addDiscussion() {
+    let apiCallUrl = Url.addParam(environment.moodleEndPoint, "forumid", environment.moodleWsForumId);
+    apiCallUrl = Url.addParam(apiCallUrl, "subject", 'Test Subject');
+    apiCallUrl = Url.addParam(apiCallUrl, "wstoken", environment.moodleWsToken);
+    apiCallUrl = Url.addParam(apiCallUrl, "wsfunction", environment.moodleWsFuncForumAddDiscussion);
+    apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
+    apiCallUrl = Url.addParam(apiCallUrl, "message", this.content);
 
-
+    this.postDataParams(apiCallUrl).then(res => {
+      if (res.exception) {
+        this.tranferError = res.message;
+        this.transferMessage = res.exception + ' - ' + res.errorcode + ' - ' + res.message;
+      }
+      else if (res) {
+        this.tranferError = ''
+        this.transferMessage = 'Forum Discussion: ' + res.discussionid + ' has been successfully added...!';
+      }
+      this.displaySuccessTranfer = true;
+      this.displayEditor = false;
+      this.displayDataExtraction = false;
+    })
   }
 
   addDiscussionPost() {
+    let apiCallUrl = Url.addParam(environment.moodleEndPoint, "postid", environment.moodleWsDiscussionId);
+    apiCallUrl = Url.addParam(apiCallUrl, "subject", 'Test Subject');
+    apiCallUrl = Url.addParam(apiCallUrl, "wstoken", environment.moodleWsToken);
+    apiCallUrl = Url.addParam(apiCallUrl, "wsfunction", environment.moodleWsFuncForumAddDiscussionPost);
+    apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
+    apiCallUrl = Url.addParam(apiCallUrl, "message", this.content);
 
-
+    this.postDataParams(apiCallUrl).then(res => {
+      if (res.exception) {
+        this.tranferError = res.message;
+        this.transferMessage = res.exception + ' - ' + res.errorcode + ' - ' + res.message;
+      }
+      else if (res) {
+        this.tranferError = ''
+        this.transferMessage = 'Forum Discussion post: ' + res.postid + ' has been successfully added...!';
+      }
+      this.displaySuccessTranfer = true;
+      this.displayEditor = false;
+      this.displayDataExtraction = false;
+    })
   }
-
-
 }
