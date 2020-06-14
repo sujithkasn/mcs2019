@@ -53,7 +53,7 @@
   <section>
     <div>
       <label>Title: </label>
-      <input kendoTextBox name="title" width="100%"/>
+      <input kendoTextBox name="title" style="width: 100%;" [value] = "title"/>
     </div>
   </section>
 </ng-container>
@@ -62,7 +62,10 @@
   <section>
     <div>
       <kendo-editor (valueChange)="valueChange($event)" [value]="content" cols="30"></kendo-editor>
+      <!-- <kendo-editor [value]="content" cols="30"></kendo-editor> -->
       <button kendoButton primary="true" class="back-btn" (click)="onClickBack(0)">Back</button>
+      &nbsp;
+      <!-- <button kendoButton primary="true" class="back-btn" (click)="onClickTransform()">Transform</button> -->
     </div>
     <div>
       <textarea name="editorOutput" id="" cols="30" rows="10" [innerHTML]="content"></textarea>

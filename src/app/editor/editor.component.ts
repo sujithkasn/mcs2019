@@ -46,7 +46,7 @@ export class EditorComponent implements OnInit {
       url: ['https://theinnovativeeducator.blogspot.com/2018/05/8-tips-for-quality-posts-during.html', [Validators.required]],
       library: ['Boilerpipe', Validators.required],
       extractor: ['Default Extractor', Validators.required],
-      outputFormat: ['JSON', Validators.required],
+      outputFormat: ['HTML', Validators.required],
     });
   }
 
@@ -114,7 +114,6 @@ export class EditorComponent implements OnInit {
     }
   }
 
-
   onSubmit() {
     this.submitted = true;
 
@@ -157,9 +156,10 @@ export class EditorComponent implements OnInit {
   }
 
   onClickCreateCourse() {
-    let courseName = "DEMO 4"
-    let courseShortName = "DEMO 4 Short"
-    let courseIdNumber = 7
+    // TODO: To be replaced from the input from front end
+    let courseName = "DEMO Course 2"
+    let courseShortName = "DEMO2"
+    let courseIdNumber = 2
     this.createCourse(courseName, courseShortName, environment.moodleWsCourseCategoryId, courseIdNumber);
   }
 
@@ -180,13 +180,13 @@ export class EditorComponent implements OnInit {
   // }
 
   createCourse(courseName: string, courseShortName: string, courseCategoryId: number, courseIdNumber: number) {
-    let apiCallUrl = Url.addParam(environment.moodleEndPoint, "courses[0][fullname]", courseName);
+    let apiCallUrl = Url.addParam(environment.moodleEndPoint, "wstoken", environment.moodleWsToken);
+    apiCallUrl = Url.addParam(apiCallUrl, "wsfunction", environment.moodleWsFuncCreateCourse);
+    apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
+    apiCallUrl = Url.addParam(apiCallUrl, "courses[0][fullname]", courseName);
     apiCallUrl = Url.addParam(apiCallUrl, "courses[0][shortname]", courseShortName);
     apiCallUrl = Url.addParam(apiCallUrl, "courses[0][categoryid]", courseCategoryId);
     apiCallUrl = Url.addParam(apiCallUrl, "courses[0][idnumber]", courseIdNumber);
-    apiCallUrl = Url.addParam(apiCallUrl, "wstoken", environment.moodleWsToken);
-    apiCallUrl = Url.addParam(apiCallUrl, "wsfunction", environment.moodleWsFuncCreateCourse);
-    apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
 
     this.postDataParams(apiCallUrl).then(res => {
       if (res.exception) {
@@ -204,11 +204,12 @@ export class EditorComponent implements OnInit {
   }
 
   addDiscussion() {
-    let apiCallUrl = Url.addParam(environment.moodleEndPoint, "forumid", environment.moodleWsForumId);
-    apiCallUrl = Url.addParam(apiCallUrl, "subject", 'Test Subject');
-    apiCallUrl = Url.addParam(apiCallUrl, "wstoken", environment.moodleWsToken);
+    let apiCallUrl = Url.addParam(environment.moodleEndPoint, "wstoken", environment.moodleWsToken);
     apiCallUrl = Url.addParam(apiCallUrl, "wsfunction", environment.moodleWsFuncForumAddDiscussion);
     apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
+    // TODO: To be replaced from the input from front end
+    apiCallUrl = Url.addParam(apiCallUrl, "forumid", environment.moodleWsForumId);
+    apiCallUrl = Url.addParam(apiCallUrl, "subject", 'DEMO Forum Discussion');
     apiCallUrl = Url.addParam(apiCallUrl, "message", this.content);
 
     this.postDataParams(apiCallUrl).then(res => {
@@ -228,7 +229,8 @@ export class EditorComponent implements OnInit {
 
   addDiscussionPost() {
     let apiCallUrl = Url.addParam(environment.moodleEndPoint, "postid", environment.moodleWsDiscussionId);
-    apiCallUrl = Url.addParam(apiCallUrl, "subject", 'Test Subject');
+    // TODO: To be replaced from the input from front end
+    apiCallUrl = Url.addParam(apiCallUrl, "subject", 'DEMO Forum Discussion Post');
     apiCallUrl = Url.addParam(apiCallUrl, "wstoken", environment.moodleWsToken);
     apiCallUrl = Url.addParam(apiCallUrl, "wsfunction", environment.moodleWsFuncForumAddDiscussionPost);
     apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
