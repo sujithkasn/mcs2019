@@ -183,8 +183,8 @@ export class EditorComponent implements OnInit {
     let apiCallUrl = Url.addParam(environment.moodleEndPoint, "wstoken", environment.moodleWsToken);
     apiCallUrl = Url.addParam(apiCallUrl, "wsfunction", environment.moodleWsFuncCreateCourse);
     apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
-    apiCallUrl = Url.addParam(apiCallUrl, "courses[0][fullname]", courseName);
-    apiCallUrl = Url.addParam(apiCallUrl, "courses[0][shortname]", courseShortName);
+    apiCallUrl = Url.addParam(apiCallUrl, "courses[0][fullname]", encodeURIComponent(courseName));
+    apiCallUrl = Url.addParam(apiCallUrl, "courses[0][shortname]", encodeURIComponent(courseShortName));
     apiCallUrl = Url.addParam(apiCallUrl, "courses[0][categoryid]", courseCategoryId);
     apiCallUrl = Url.addParam(apiCallUrl, "courses[0][idnumber]", courseIdNumber);
 
@@ -209,8 +209,8 @@ export class EditorComponent implements OnInit {
     apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
     // TODO: To be replaced from the input from front end
     apiCallUrl = Url.addParam(apiCallUrl, "forumid", environment.moodleWsForumId);
-    apiCallUrl = Url.addParam(apiCallUrl, "subject", 'DEMO Forum Discussion');
-    apiCallUrl = Url.addParam(apiCallUrl, "message", this.content);
+    apiCallUrl = Url.addParam(apiCallUrl, "subject", encodeURIComponent('DEMO Forum Discussion'));
+    apiCallUrl = Url.addParam(apiCallUrl, "message", encodeURIComponent(this.content));
 
     this.postDataParams(apiCallUrl).then(res => {
       if (res.exception) {
@@ -228,13 +228,14 @@ export class EditorComponent implements OnInit {
   }
 
   addDiscussionPost() {
-    let apiCallUrl = Url.addParam(environment.moodleEndPoint, "postid", environment.moodleWsDiscussionId);
-    // TODO: To be replaced from the input from front end
-    apiCallUrl = Url.addParam(apiCallUrl, "subject", 'DEMO Forum Discussion Post');
-    apiCallUrl = Url.addParam(apiCallUrl, "wstoken", environment.moodleWsToken);
+    let apiCallUrl = Url.addParam(environment.moodleEndPoint, "wstoken", environment.moodleWsToken);
     apiCallUrl = Url.addParam(apiCallUrl, "wsfunction", environment.moodleWsFuncForumAddDiscussionPost);
     apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
-    apiCallUrl = Url.addParam(apiCallUrl, "message", this.content);
+    Url.addParam(apiCallUrl, "postid", environment.moodleWsDiscussionId);
+    apiCallUrl = 
+    // TODO: To be replaced from the input from front end
+    apiCallUrl = Url.addParam(apiCallUrl, "subject", encodeURIComponent('DEMO Forum Discussion Post'));
+    apiCallUrl = Url.addParam(apiCallUrl, "message", encodeURIComponent(this.content));
 
     this.postDataParams(apiCallUrl).then(res => {
       if (res.exception) {
