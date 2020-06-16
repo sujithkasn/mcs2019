@@ -6,39 +6,40 @@
       <div class="form-group">
         <label>URL</label>
         <input kendoTextBox formControlName="url" class="form-control"
-          [ngClass]="{ 'ng-invalid ng-touched': submitted && f.url.errors }" />
-        <div *ngIf="submitted && f.url.errors" class="k-tooltip-validation">
-          <div *ngIf="f.url.errors.required">URL is required</div>
+          [ngClass]="{ 'ng-invalid ng-touched': submitted && regForm.url.errors }" />
+        <div *ngIf="submitted && regForm.url.errors" class="k-tooltip-validation">
+          <div *ngIf="regForm.url.errors.required">URL is required</div>
         </div>
       </div>
 
       <div class="form-group">
         <label>Library</label>
         <kendo-dropdownlist formControlName="library" [data]="libraries" class="form-control"
-          [ngClass]="{ 'ng-invalid ng-touched': submitted && f.library.errors }" (valueChange)="onLibraryChange()">
+          [ngClass]="{ 'ng-invalid ng-touched': submitted && regForm.library.errors }"
+          (valueChange)="onLibraryChange()">
         </kendo-dropdownlist>
-        <div *ngIf="submitted && f.library.errors" class="k-tooltip-validation">
-          <div *ngIf="f.library.errors.required">Library is required</div>
+        <div *ngIf="submitted && regForm.library.errors" class="k-tooltip-validation">
+          <div *ngIf="regForm.library.errors.required">Library is required</div>
         </div>
       </div>
 
       <div class="form-group">
         <label>Extractor</label>
         <kendo-dropdownlist formControlName="extractor" [data]="extractors" class="form-control"
-          [ngClass]="{ 'ng-invalid ng-touched': submitted && f.extractor.errors }">
+          [ngClass]="{ 'ng-invalid ng-touched': submitted && regForm.extractor.errors }">
         </kendo-dropdownlist>
-        <div *ngIf="submitted && f.extractor.errors" class="k-tooltip-validation">
-          <div *ngIf="f.extractor.errors.required">Extractor is required</div>
+        <div *ngIf="submitted && regForm.extractor.errors" class="k-tooltip-validation">
+          <div *ngIf="regForm.extractor.errors.required">Extractor is required</div>
         </div>
       </div>
 
       <div class="form-group">
         <label>Output Format</label>
         <kendo-dropdownlist formControlName="outputFormat" [data]="outputFormats" class="form-control"
-          [ngClass]="{ 'ng-invalid ng-touched': submitted && f.outputFormat.errors }">
+          [ngClass]="{ 'ng-invalid ng-touched': submitted && regForm.outputFormat.errors }">
         </kendo-dropdownlist>
-        <div *ngIf="submitted && f.outputFormat.errors" class="k-tooltip-validation">
-          <div *ngIf="f.outputFormat.errors.required">Output Format is required</div>
+        <div *ngIf="submitted && regForm.outputFormat.errors" class="k-tooltip-validation">
+          <div *ngIf="regForm.outputFormat.errors.required">Output Format is required</div>
         </div>
       </div>
 
@@ -49,33 +50,54 @@
   </div>
 </ng-container>
 
+<ng-container *ngIf="displayEditor" style="width: 100%;">
+  <section>
+    <form [formGroup]="contentForm" style="width: 100%;">
+      <label><b>Title:</b>&nbsp;</label>
+      <input kendoTextBox formControlName="title" style="width: 100%;" />
+    </form>
+  </section>
+</ng-container>
+
 <ng-container *ngIf="displayEditor">
   <section>
-    <div>
-      <label>Title: </label>
-      <input kendoTextBox name="title" style="width: 100%;" [value] = "title"/>
+    <div style="width: 50%;">
+      <form [formGroup]="kendoEditorForm" style="width: 100%;">
+        <kendo-editor formControlName="kendoEditor" (valueChange)="valueChange($event)" [value]="content" cols="30"></kendo-editor>
+        <!-- <kendo-editor [value]="content" cols="30"></kendo-editor>
+      <button kendoButton primary="true" class="back-btn" (click)="onClickBack(0)">Back</button>
+      &nbsp;
+      <button kendoButton primary="true" class="back-btn" (click)="onClickTransform()">Transform</button> 
+      <button kendoButton primary="true" class="back-btn" (click)="onClickTransform()">Transform</button> -->
+      </form>
+    </div>
+    <div style="width: 50%;">
+      <label><b>Generated HTML:</b>&nbsp;</label>
+      <textarea class="k-content" name="editorOutput" id="" cols="30" [innerHTML]="content"></textarea>
+      <!-- <div style="width: 100%;">
+        <button kendoButton primary="true" (click)="onClickCreateCourse()">Create Course</button>
+        &nbsp;
+        <button kendoButton primary="true" (click)="onClickAddDiscussion()">Create Forum Discussion</button>
+        &nbsp;
+        <button kendoButton primary="true" (click)="onClickAddDiscussionPost()">Add Discussion Post</button>
+      </div> -->
     </div>
   </section>
 </ng-container>
 
 <ng-container *ngIf="displayEditor">
   <section>
-    <div>
-      <kendo-editor (valueChange)="valueChange($event)" [value]="content" cols="30"></kendo-editor>
-      <!-- <kendo-editor [value]="content" cols="30"></kendo-editor> -->
+    <div style="width: 50%">
       <button kendoButton primary="true" class="back-btn" (click)="onClickBack(0)">Back</button>
       &nbsp;
-      <!-- <button kendoButton primary="true" class="back-btn" (click)="onClickTransform()">Transform</button> -->
+      <button kendoButton primary="true" class="back-btn" (click)="onClickTransform()">Transform</button>
+      &nbsp;
+      <button kendoButton primary="true" (click)="onClickCreateCourse()">Create Course</button>
     </div>
-    <div>
-      <textarea name="editorOutput" id="" cols="30" rows="10" [innerHTML]="content"></textarea>
-      <div style="width: 100%;">
-        <button kendoButton primary="true" (click)="onClickCreateCourse()">Create Course</button>
-        &nbsp;
-        <button kendoButton primary="true" (click)="onClickAddDiscussion()">Create Forum Discussion</button>
-        &nbsp;
-        <button kendoButton primary="true" (click)="onClickAddDiscussionPost()">Add Discussion Post</button>
-      </div>
+    <div style="width: 50%">
+      <button kendoButton primary="true" (click)="onClickAddDiscussion()">Create Forum Discussion</button>
+      &nbsp;
+      <button kendoButton primary="true" (click)="onClickAddDiscussionPost()">Add Discussion Post</button>
     </div>
   </section>
 </ng-container>
@@ -84,13 +106,13 @@
   <section>
     <div>
       <div *ngIf="tranferError == ''">
-        <h3>Course Successfully Created...!</h3>
+        <h3>{{createdItem}} Successfully Created...!</h3>
         <h4>Details:</h4>
         <p>{{transferMessage}}</p>
       </div>
 
       <div *ngIf="tranferError != ''">
-        <h3>Error in Course creation...!!!</h3>
+        <h3>Error in {{createdItem}} creation...!!!</h3>
         <h4>Detailed Error:</h4>
         <p>{{transferMessage}}</p>
       </div>

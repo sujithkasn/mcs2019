@@ -13,6 +13,8 @@ import { stringify } from 'querystring';
 export class EditorComponent implements OnInit {
 
   registerForm: FormGroup;
+  contentForm: FormGroup;
+  kendoEditorForm: FormGroup;
   submitted = false;
   libraries = ['', 'Boilerpipe', 'BoilerPy3', 'BeautifulSoup'];
   beautifulSoupExtractors = ['N/A'];
@@ -27,6 +29,7 @@ export class EditorComponent implements OnInit {
   displayDataExtraction = true;
   displayEditor = false;
   displaySuccessTranfer = false;
+  createdItem = '';
   tranferError = '';
   transferMessage = '';
 
@@ -48,10 +51,18 @@ export class EditorComponent implements OnInit {
       extractor: ['Default Extractor', Validators.required],
       outputFormat: ['HTML', Validators.required],
     });
+    this.contentForm = this.formBuilder.group({
+      title: ['', [Validators.required]],
+    });
+    this.kendoEditorForm = this.formBuilder.group({
+      kendoEditor: ['', [Validators.required]],
+    });
   }
 
   // convenience getter for easy access to form fields
-  get f() { return this.registerForm.controls; }
+  get regForm() { return this.registerForm.controls; }
+
+  // get contForm() { return this.contForm.controls; }
 
   async postData(url = '', data = {}) {
     // Default options are marked with *
@@ -134,11 +145,16 @@ export class EditorComponent implements OnInit {
       "outputformat": this.outputFormat
     }).then(res => {
       this.title = res.title;
+      this.contentForm.controls['title'].setValue(this.title);
+      this.kendoEditorForm.controls['kendoEditor'].setValue(res.content);
       this.content = res.content;
       this.displayEditor = true;
       this.displayDataExtraction = false;
       this.displaySuccessTranfer = false;
+
+      // this.kendoEditorForm.controls['kendoEditor'].updateValueAndValidity({ onlySelf: true, emitEvent: true });
     })
+    this.valueChange(this.kendoEditorForm.controls['kendoEditor'].value);
   }
 
   onClickBack(step: number) {
@@ -147,35 +163,42 @@ export class EditorComponent implements OnInit {
       this.displayEditor = false;
       this.displaySuccessTranfer = false;
       this.transferMessage = '';
+      this.createdItem = '';
     } else if (step == 1) {
       this.displayDataExtraction = false;
       this.displayEditor = true;
       this.displaySuccessTranfer = false;
       this.transferMessage = '';
+      this.createdItem = '';
     }
   }
 
   onClickCreateCourse() {
     // TODO: To be replaced from the input from front end
     let courseName = "DEMO Course 2"
-    let courseShortName = "DEMO2"
+    let courseShortName = "DEMO 2"
     let courseIdNumber = 2
+    this.createdItem = "Course";
     this.createCourse(courseName, courseShortName, environment.moodleWsCourseCategoryId, courseIdNumber);
   }
 
   onClickAddDiscussion() {
+    this.createdItem = "Forum Discussion";
     this.addDiscussion();
   }
 
   onClickAddDiscussionPost() {
+    this.createdItem = "Discussion Post";
     this.addDiscussionPost();
   }
 
   // onClickAddNewWikiPage() {
+  // this.createdItem = "New Wiki Page";
 
   // }
 
   // onClickAddContentToWikiPage() {
+  // this.createdItem = "Wiki page content";
 
   // }
 
@@ -200,7 +223,7 @@ export class EditorComponent implements OnInit {
       this.displaySuccessTranfer = true;
       this.displayEditor = false;
       this.displayDataExtraction = false;
-    })
+    });
   }
 
   addDiscussion() {
@@ -213,7 +236,7 @@ export class EditorComponent implements OnInit {
     apiCallUrl = Url.addParam(apiCallUrl, "message", encodeURIComponent(this.content));
 
     this.postDataParams(apiCallUrl).then(res => {
-      if (res.exception) {
+       if (res.exception) {
         this.tranferError = res.message;
         this.transferMessage = res.exception + ' - ' + res.errorcode + ' - ' + res.message;
       }
@@ -231,8 +254,7 @@ export class EditorComponent implements OnInit {
     let apiCallUrl = Url.addParam(environment.moodleEndPoint, "wstoken", environment.moodleWsToken);
     apiCallUrl = Url.addParam(apiCallUrl, "wsfunction", environment.moodleWsFuncForumAddDiscussionPost);
     apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
-    Url.addParam(apiCallUrl, "postid", environment.moodleWsDiscussionId);
-    apiCallUrl = 
+    apiCallUrl = Url.addParam(apiCallUrl, "postid", environment.moodleWsDiscussionId);
     // TODO: To be replaced from the input from front end
     apiCallUrl = Url.addParam(apiCallUrl, "subject", encodeURIComponent('DEMO Forum Discussion Post'));
     apiCallUrl = Url.addParam(apiCallUrl, "message", encodeURIComponent(this.content));
