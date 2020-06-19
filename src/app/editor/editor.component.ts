@@ -16,13 +16,19 @@ export class EditorComponent implements OnInit {
   contentForm: FormGroup;
   kendoEditorForm: FormGroup;
   submitted = false;
-  libraries = ['', 'Boilerpipe', 'BoilerPy3', 'BeautifulSoup'];
-  beautifulSoupExtractors = ['N/A'];
-  boilerpipeExtractors = ['', 'Default Extractor', 'Article Extractor', 'Largest Content Extractor', 'Keep Everything Extractor'];
-  boilerPy3Extractors = ['', 'Default Extractor', 'Article Extractor', 'Article Sentences Extractor', 'Largest Content Extractor', 'Canola Extractor', 'Keep Everything Extractor', 'Num Words Rules Extractor'];
-  outputFormats = ['', 'HTML', 'HTML Fragment', 'Text', 'JSON'];
 
-  extractors = this.boilerpipeExtractors;
+  // libraries = ['', 'Boilerpipe', 'BoilerPy3', 'Readability', 'Readability+BeautifulSoup'];
+  libraries = ['', 'Readability', 'Boilerpipe', 'Newspaper'];
+  noExtractors = ['N/A'];
+  boilerpipeExtractors = ['', 'Default Extractor', 'Article Extractor', 'Largest Content Extractor', 'Keep Everything Extractor'];
+  // boilerPy3Extractors = ['', 'Default Extractor', 'Article Extractor', 'Article Sentences Extractor', 'Largest Content Extractor', 'Canola Extractor', 'Keep Everything Extractor', 'Num Words Rules Extractor'];
+  // outputFormats = ['', 'HTML', 'HTML Fragment', 'Text', 'JSON'];
+  outputFormats = ['']
+  readabilityOutputFormats = ['HTML'];
+  boilerpipeOutputFormats = ['', 'HTML', 'HTML Fragment', 'Text', 'JSON'];
+  newspaperOutputFormats = ['HTML', 'Text'];
+
+  extractors = this.noExtractors;
 
   title = '';
   content = '';
@@ -46,9 +52,9 @@ export class EditorComponent implements OnInit {
 
   ngOnInit() {
     this.registerForm = this.formBuilder.group({
-      url: ['https://theinnovativeeducator.blogspot.com/2018/05/8-tips-for-quality-posts-during.html', [Validators.required]],
-      library: ['Boilerpipe', Validators.required],
-      extractor: ['Default Extractor', Validators.required],
+      url: ['http://techblogs/uxx/?p=7461', [Validators.required]],
+      library: ['Readability', Validators.required],
+      extractor: ['N/A', Validators.required],
       outputFormat: ['HTML', Validators.required],
     });
     this.contentForm = this.formBuilder.group({
@@ -101,20 +107,31 @@ export class EditorComponent implements OnInit {
 
   onLibraryChange() {
     switch (this.registerForm.controls['library'].value) {
+      case 'Readability':
+        this.extractors = this.noExtractors;
+        this.outputFormats = this.readabilityOutputFormats;
+        this.registerForm.controls['extractor'].setValue(this.extractors[0]);
+        this.registerForm.controls['outputFormat'].setValue(this.outputFormats[0]);
+        break;
+
       case 'Boilerpipe':
         this.extractors = this.boilerpipeExtractors;
+        this.outputFormats = this.boilerpipeOutputFormats;
         this.registerForm.controls['extractor'].setValue(this.extractors[1]);
+        // this.registerForm.controls['outputFormat'].setValue(this.outputFormats[1]);
         break;
 
-      case 'BoilerPy3':
-        this.extractors = this.boilerPy3Extractors;
-        this.registerForm.controls['extractor'].setValue(this.extractors[1]);
-        break;
-
-      case 'BeautifulSoup':
-        this.extractors = this.beautifulSoupExtractors;
+      case 'Newspaper':
+        this.extractors = this.noExtractors;
+        this.outputFormats = this.newspaperOutputFormats;
         this.registerForm.controls['extractor'].setValue(this.extractors[0]);
+        this.registerForm.controls['outputFormat'].setValue(this.outputFormats[0]);
         break;
+
+      // case 'BoilerPy3':
+      //   this.extractors = this.boilerPy3Extractors;
+      //   this.registerForm.controls['extractor'].setValue(this.extractors[1]);
+      //   break;
 
       case '':
         this.extractors = [];
@@ -236,7 +253,7 @@ export class EditorComponent implements OnInit {
     apiCallUrl = Url.addParam(apiCallUrl, "message", encodeURIComponent(this.content));
 
     this.postDataParams(apiCallUrl).then(res => {
-       if (res.exception) {
+      if (res.exception) {
         this.tranferError = res.message;
         this.transferMessage = res.exception + ' - ' + res.errorcode + ' - ' + res.message;
       }
