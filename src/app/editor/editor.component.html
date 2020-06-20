@@ -1,7 +1,7 @@
 <ng-container *ngIf="displayDataExtraction">
 
-  <h5 class="card-header">Data Extraction Form</h5>
-  <div class="card-body" style="width: 80%;align-content: center;">
+  <h5 class="card-header">Extract Content from Blog</h5>
+  <div class="card-body">
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label>URL</label>
@@ -52,13 +52,9 @@
 
 <ng-container *ngIf="displayEditor" style="width: 100%;">
   <section>
-    <form [formGroup]="contentForm" style="width: 50%;">
+    <form [formGroup]="contentForm" style="width: 100%;">
       <label><b>Title:</b>&nbsp;</label>
-      <input kendoTextBox formControlName="title" style="width: 98%;" />
-    </form>
-    <form [formGroup]="contentForm" style="width: 50%;">
-      <label><b>Source:</b>&nbsp;</label>
-      <input kendoTextBox formControlName="source" style="width: 98%;"/>
+      <input kendoTextBox formControlName="title" style="width: 100%;" />
     </form>
   </section>
 </ng-container>

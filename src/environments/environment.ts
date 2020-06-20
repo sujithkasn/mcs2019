@@ -12,7 +12,7 @@ export const environment = {
   moodleWsFuncForumAddDiscussion: 'mod_forum_add_discussion',
   moodleWsFuncForumAddDiscussionPost: 'mod_forum_add_discussion_post',
   moodleWsCourseCategoryId: 13,
-  moodleWsForumId: 38,
+  moodleWsForumId: 43,
   moodleWsDiscussionId: 87,
 };
 

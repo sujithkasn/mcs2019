@@ -52,7 +52,7 @@ export class EditorComponent implements OnInit {
 
   ngOnInit() {
     this.registerForm = this.formBuilder.group({
-      url: ['http://techblogs/uxx/?p=7461', [Validators.required]],
+      url: ['http://techblogs/uxx/?p=7454', [Validators.required]],
       library: ['Readability', Validators.required],
       extractor: ['N/A', Validators.required],
       outputFormat: ['HTML', Validators.required],
@@ -94,10 +94,10 @@ export class EditorComponent implements OnInit {
       mode: 'cors', // no-cors, *cors, same-origin
       cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
       credentials: 'same-origin', // include, *same-origin, omit
-      headers: {
-        'Content-Type': 'application/json'
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
+      // headers: {
+      //   'Content-Type': 'application/json'
+      //   // 'Content-Type': 'application/x-www-form-urlencoded',
+      // },
       redirect: 'follow', // manual, *follow, error
       referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
       body: JSON.stringify(data)// body data type must match "Content-Type" header
@@ -146,14 +146,15 @@ export class EditorComponent implements OnInit {
     this.submitted = true;
 
     // stop here if form is invalid
-    if (this.registerForm.invalid) {
-      return;
-    }
+    // if (this.registerForm.invalid) {
+    //   return;
+    // }
 
     this.url = this.registerForm.controls['url'].value;
     this.library = this.registerForm.controls['library'].value;
     this.extractor = this.registerForm.controls['extractor'].value;
     this.outputFormat = this.registerForm.controls['outputFormat'].value;
+
 
     this.postData(environment.extractorEndPoint, {
       "url": this.url,
@@ -161,17 +162,27 @@ export class EditorComponent implements OnInit {
       "extractor": this.extractor,
       "outputformat": this.outputFormat
     }).then(res => {
-      this.title = res.title;
+      // Adding Library and extractor to the title
+      if (this.extractor != "" && this.extractor != "N/A") {
+        this.title = res.title + " : (" + this.library + " - " + this.extractor + ")";
+      }
+      else {
+        this.title = res.title + " : (" + this.library + ")";
+      }
+
       this.contentForm.controls['title'].setValue(this.title);
       this.kendoEditorForm.controls['kendoEditor'].setValue(res.content);
       this.content = res.content;
       this.displayEditor = true;
       this.displayDataExtraction = false;
       this.displaySuccessTranfer = false;
-
       // this.kendoEditorForm.controls['kendoEditor'].updateValueAndValidity({ onlySelf: true, emitEvent: true });
-    })
-    this.valueChange(this.kendoEditorForm.controls['kendoEditor'].value);
+    }).finally(() => {
+      this.displayEditor = true;
+      this.displayDataExtraction = false;
+      this.displaySuccessTranfer = false;
+    });
+    // this.valueChange(this.kendoEditorForm.controls['kendoEditor'].value);
   }
 
   onClickBack(step: number) {
@@ -249,7 +260,7 @@ export class EditorComponent implements OnInit {
     apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
     // TODO: To be replaced from the input from front end
     apiCallUrl = Url.addParam(apiCallUrl, "forumid", environment.moodleWsForumId);
-    apiCallUrl = Url.addParam(apiCallUrl, "subject", encodeURIComponent('DEMO Forum Discussion'));
+    apiCallUrl = Url.addParam(apiCallUrl, "subject", encodeURIComponent(this.title));
     apiCallUrl = Url.addParam(apiCallUrl, "message", encodeURIComponent(this.content));
 
     this.postDataParams(apiCallUrl).then(res => {
@@ -264,30 +275,30 @@ export class EditorComponent implements OnInit {
       this.displaySuccessTranfer = true;
       this.displayEditor = false;
       this.displayDataExtraction = false;
-    })
+    });
   }
 
-  addDiscussionPost() {
-    let apiCallUrl = Url.addParam(environment.moodleEndPoint, "wstoken", environment.moodleWsToken);
-    apiCallUrl = Url.addParam(apiCallUrl, "wsfunction", environment.moodleWsFuncForumAddDiscussionPost);
-    apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
-    apiCallUrl = Url.addParam(apiCallUrl, "postid", environment.moodleWsDiscussionId);
-    // TODO: To be replaced from the input from front end
-    apiCallUrl = Url.addParam(apiCallUrl, "subject", encodeURIComponent('DEMO Forum Discussion Post'));
-    apiCallUrl = Url.addParam(apiCallUrl, "message", encodeURIComponent(this.content));
+addDiscussionPost() {
+  let apiCallUrl = Url.addParam(environment.moodleEndPoint, "wstoken", environment.moodleWsToken);
+  apiCallUrl = Url.addParam(apiCallUrl, "wsfunction", environment.moodleWsFuncForumAddDiscussionPost);
+  apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
+  apiCallUrl = Url.addParam(apiCallUrl, "postid", environment.moodleWsDiscussionId);
+  // TODO: To be replaced from the input from front end
+  apiCallUrl = Url.addParam(apiCallUrl, "subject", encodeURIComponent('DEMO Forum Discussion Post'));
+  apiCallUrl = Url.addParam(apiCallUrl, "message", encodeURIComponent(this.content));
 
-    this.postDataParams(apiCallUrl).then(res => {
-      if (res.exception) {
-        this.tranferError = res.message;
-        this.transferMessage = res.exception + ' - ' + res.errorcode + ' - ' + res.message;
-      }
-      else if (res) {
-        this.tranferError = ''
-        this.transferMessage = 'Forum Discussion post: ' + res.postid + ' has been successfully added...!';
-      }
-      this.displaySuccessTranfer = true;
-      this.displayEditor = false;
-      this.displayDataExtraction = false;
-    })
-  }
+  this.postDataParams(apiCallUrl).then(res => {
+    if (res.exception) {
+      this.tranferError = res.message;
+      this.transferMessage = res.exception + ' - ' + res.errorcode + ' - ' + res.message;
+    }
+    else if (res) {
+      this.tranferError = ''
+      this.transferMessage = 'Forum Discussion post: ' + res.postid + ' has been successfully added...!';
+    }
+    this.displaySuccessTranfer = true;
+    this.displayEditor = false;
+    this.displayDataExtraction = false;
+  })
+}
 }
