@@ -32,3 +32,31 @@ section {
   }
 
 }
+
+h5 {
+  font-size: 16px;
+  margin: 0;
+  font-weight: normal;
+  letter-spacing: 0.4px;
+  opacity: 0.7;
+.success {
+  color: green;
+}
+.error {
+  color: crimson;
+}
+}
+
+p {
+  font-size: 14px;
+  margin: 0;
+  font-weight: normal;
+  letter-spacing: 0.4px;
+  opacity: 0.7;
+.success {
+  color: green;
+}
+.error {
+  color: crimson;
+}
+}

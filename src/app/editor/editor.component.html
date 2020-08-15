@@ -4,7 +4,7 @@
   <div class="card-body">
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
-        <label>URL</label>
+        <label>URL:</label>
         <input kendoTextBox formControlName="url" class="form-control"
           [ngClass]="{ 'ng-invalid ng-touched': submitted && regForm.url.errors }" />
         <div *ngIf="submitted && regForm.url.errors" class="k-tooltip-validation">
@@ -13,7 +13,7 @@
       </div>
 
       <div class="form-group">
-        <label>Library</label>
+        <label>Library:</label>
         <kendo-dropdownlist formControlName="library" [data]="libraries" class="form-control"
           [ngClass]="{ 'ng-invalid ng-touched': submitted && regForm.library.errors }"
           (valueChange)="onLibraryChange()">
@@ -24,7 +24,7 @@
       </div>
 
       <div class="form-group">
-        <label>Extractor</label>
+        <label>Extractor:</label>
         <kendo-dropdownlist formControlName="extractor" [data]="extractors" class="form-control"
           [ngClass]="{ 'ng-invalid ng-touched': submitted && regForm.extractor.errors }">
         </kendo-dropdownlist>
@@ -34,7 +34,7 @@
       </div>
 
       <div class="form-group">
-        <label>Output Format</label>
+        <label>Output Format:</label>
         <kendo-dropdownlist formControlName="outputFormat" [data]="outputFormats" class="form-control"
           [ngClass]="{ 'ng-invalid ng-touched': submitted && regForm.outputFormat.errors }">
         </kendo-dropdownlist>
@@ -63,24 +63,13 @@
   <section>
     <div style="width: 50%;">
       <form [formGroup]="kendoEditorForm" style="width: 100%;">
-        <kendo-editor formControlName="kendoEditor" (valueChange)="valueChange($event)" [value]="content" cols="30"></kendo-editor>
-        <!-- <kendo-editor [value]="content" cols="30"></kendo-editor>
-      <button kendoButton primary="true" class="back-btn" (click)="onClickBack(0)">Back</button>
-      &nbsp;
-      <button kendoButton primary="true" class="back-btn" (click)="onClickTransform()">Transform</button> 
-      <button kendoButton primary="true" class="back-btn" (click)="onClickTransform()">Transform</button> -->
+        <kendo-editor formControlName="kendoEditor" (valueChange)="valueChange($event)" [value]="content" cols="30">
+        </kendo-editor>
       </form>
     </div>
     <div style="width: 50%;">
       <label><b>Generated HTML:</b>&nbsp;</label>
       <textarea class="k-content" name="editorOutput" id="" cols="30" [innerHTML]="content"></textarea>
-      <!-- <div style="width: 100%;">
-        <button kendoButton primary="true" (click)="onClickCreateCourse()">Create Course</button>
-        &nbsp;
-        <button kendoButton primary="true" (click)="onClickAddDiscussion()">Create Forum Discussion</button>
-        &nbsp;
-        <button kendoButton primary="true" (click)="onClickAddDiscussionPost()">Add Discussion Post</button>
-      </div> -->
     </div>
   </section>
 </ng-container>
@@ -92,7 +81,8 @@
       &nbsp;
       <button kendoButton primary="true" class="back-btn" (click)="onClickTransform()">Transform</button>
       &nbsp;
-      <button kendoButton primary="true" (click)="onClickCreateCourse()">Create Course</button>
+      <!-- <button kendoButton primary="true" (click)="onClickCreateCourse()">Create Course</button> -->
+      <button kendoButton primary="true" class="back-btn" (click)="onCreateCourseDialogOpen()">Create Course</button>
     </div>
     <div style="width: 50%">
       <button kendoButton primary="true" (click)="onClickAddDiscussion()">Create Forum Discussion</button>
@@ -117,6 +107,15 @@
         <p>{{transferMessage}}</p>
       </div>
 
+      <!-- <div>
+        <label for="category">Category:</label>
+        <select id="category">
+          <option *ngFor="let category of categories$; let i = index" [value]="categories$[i].id">
+            {{categories$[i].name}}
+          </option>
+        </select>
+      </div> -->
+
       <div>
         <div>
           <button kendoButton primary="true" (click)="onClickBack(1)">Back</button>
@@ -128,3 +127,56 @@
   </section>
 
 </ng-container>
+
+
+
+<!-- Create Course Dialog -->
+
+<div class="k-overlay" *ngIf="createCourseDialogOpened"></div>
+<div class="example-wrapper">
+  <!-- <button kendoButton (click)="onCreateCourseDialogOpen()">Open window</button> -->
+  <!-- <p *ngIf="dataSaved">Data has been saved</p> -->
+  <kendo-window title="Create Course" *ngIf="createCourseDialogOpened" (close)="onCreateCourseDialogClose()" [minWidth]="250" [width]="450" [height]="525">
+    <form class="k-form">
+      <fieldset>
+        <legend>Provide Course Details</legend>
+
+        <div *ngIf="tranferError == '' && transferMessage != ''">
+          <h6 class="success">{{createdItem}} Successfully Created...!</h6>
+          <p class="success">{{transferMessage}}</p>
+        </div>
+  
+        <div *ngIf="tranferError != ''">
+          <h6 class="error">Error in {{createdItem}} creation...!!!</h6>
+          <p class="error">{{transferMessage}}</p>
+        </div>
+
+        <label class="k-form-field">
+          <span>Course Name:</span>
+          <input class="k-textbox" placeholder="Course Name" name="courseName" [(ngModel)]="courseToCreate.courseName" />
+        </label>
+        <label class="k-form-field">
+          <span>Course Short Name:</span>
+          <input class="k-textbox" placeholder="Course Short Name" name="courseShortName" [(ngModel)]="courseToCreate.courseShortName" />
+        </label>
+        <label class="k-form-field">
+          <span>Course Category:</span>
+          <kendo-dropdownlist [data]="courseCategories$ | async" name="courseCategory" [(ngModel)]="courseToCreate.courseCategory" textField="name" valueField="id">
+          </kendo-dropdownlist>
+        </label>
+        <label class="k-form-field">
+          <span>Course ID (optional):</span>
+          <input class="k-textbox" placeholder="Course ID" name="courseId" [(ngModel)]="courseToCreate.courseIdNumber" />
+        </label>
+      </fieldset>
+      <br/>
+      <div class="text-right">
+        <button type="button" class="k-button" (click)="onCreateCourseDialogClose()">Cancel</button>
+        &nbsp;
+        <button type="button" class="k-button k-primary" (click)="submit()">OK</button>
+      </div>
+    </form>
+  </kendo-window>
+</div>
+
+<!-- Create Course Dialog -->
