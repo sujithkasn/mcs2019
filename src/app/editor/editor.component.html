@@ -1,5 +1,4 @@
 <ng-container *ngIf="displayDataExtraction">
-
   <h5 class="card-header">Extract Content from Blog</h5>
   <div class="card-body">
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
@@ -81,13 +80,12 @@
       &nbsp;
       <button kendoButton primary="true" class="back-btn" (click)="onClickTransform()">Transform</button>
       &nbsp;
-      <!-- <button kendoButton primary="true" (click)="onClickCreateCourse()">Create Course</button> -->
       <button kendoButton primary="true" class="back-btn" (click)="onCreateCourseDialogOpen()">Create Course</button>
     </div>
     <div style="width: 50%">
-      <button kendoButton primary="true" (click)="onClickAddDiscussion()">Create Forum Discussion</button>
-      &nbsp;
-      <button kendoButton primary="true" (click)="onClickAddDiscussionPost()">Add Discussion Post</button>
+      <button kendoButton primary="true" (click)="createForumDiscussionDialogOpen()">Create Forum Discussion</button>
+      <!-- &nbsp;
+      <button kendoButton primary="true" (click)="createDicussionPostDialogOpen()">Add Discussion Post</button> -->
     </div>
   </section>
 </ng-container>
@@ -107,15 +105,6 @@
         <p>{{transferMessage}}</p>
       </div>
 
-      <!-- <div>
-        <label for="category">Category:</label>
-        <select id="category">
-          <option *ngFor="let category of categories$; let i = index" [value]="categories$[i].id">
-            {{categories$[i].name}}
-          </option>
-        </select>
-      </div> -->
-
       <div>
         <div>
           <button kendoButton primary="true" (click)="onClickBack(1)">Back</button>
@@ -134,20 +123,18 @@
 
 <div class="k-overlay" *ngIf="createCourseDialogOpened"></div>
 <div class="example-wrapper">
-  <!-- <button kendoButton (click)="onCreateCourseDialogOpen()">Open window</button> -->
-  <!-- <p *ngIf="dataSaved">Data has been saved</p> -->
   <kendo-window title="Create Course" *ngIf="createCourseDialogOpened" (close)="onCreateCourseDialogClose()" [minWidth]="250" [width]="450" [height]="525">
     <form class="k-form">
       <fieldset>
         <legend>Provide Course Details</legend>
 
         <div *ngIf="tranferError == '' && transferMessage != ''">
-          <h6 class="success">{{createdItem}} Successfully Created...!</h6>
+          <h6 class="success">{{createdItem}} Created Successfully.</h6>
           <p class="success">{{transferMessage}}</p>
         </div>
   
         <div *ngIf="tranferError != ''">
-          <h6 class="error">Error in {{createdItem}} creation...!!!</h6>
+          <h6 class="error">Error in {{createdItem}} creation!</h6>
           <p class="error">{{transferMessage}}</p>
         </div>
 
@@ -165,7 +152,7 @@
           </kendo-dropdownlist>
         </label>
         <label class="k-form-field">
-          <span>Course ID (optional):</span>
+          <span>Course ID:</span>
           <input class="k-textbox" placeholder="Course ID" name="courseId" [(ngModel)]="courseToCreate.courseIdNumber" />
         </label>
       </fieldset>
@@ -173,10 +160,52 @@
       <div class="text-right">
         <button type="button" class="k-button" (click)="onCreateCourseDialogClose()">Cancel</button>
         &nbsp;
-        <button type="button" class="k-button k-primary" (click)="submit()">OK</button>
+        <button type="button" class="k-button k-primary" (click)="submitCreateCourse()">OK</button>
       </div>
     </form>
   </kendo-window>
 </div>
 
 <!-- Create Course Dialog -->
+
+<!-- Create Forum Discussion Dialog -->
+
+<div class="k-overlay" *ngIf="createForumDiscussionDialogOpened"></div>
+<div class="example-wrapper">
+  <kendo-window title="Create Forum Discussion" *ngIf="createForumDiscussionDialogOpened" (close)="onCreateForumDiscussionDialogClose()" [minWidth]="250" [width]="450" [height]="400">
+    <form class="k-form">
+      <fieldset>
+        <legend>Provide Forum Discussion Details</legend>
+
+        <div *ngIf="tranferError == '' && transferMessage != ''">
+          <h6 class="success">{{createdItem}} Created Successfully.</h6>
+          <p class="success">{{transferMessage}}</p>
+        </div>
+  
+        <div *ngIf="tranferError != ''">
+          <h6 class="error">Error in {{createdItem}} creation!</h6>
+          <p class="error">{{transferMessage}}</p>
+        </div>
+
+        <label class="k-form-field">
+          <span>Course:</span>
+          <kendo-dropdownlist [data]="courses$ | async" name="course" [(ngModel)]="forumDiscussionToCreate.course" textField="fullname" valueField="id" (valueChange)="onCourseChange()">
+          </kendo-dropdownlist>
+        </label>
+        <label class="k-form-field">
+          <span>Forum:</span>
+          <kendo-dropdownlist [data]="courseForums$ | async" name="courseForum" [(ngModel)]="forumDiscussionToCreate.forum" textField="name" valueField="id">
+          </kendo-dropdownlist>
+        </label>
+      </fieldset>
+      <br/>
+      <div class="text-right">
+        <button type="button" class="k-button" (click)="onCreateForumDiscussionDialogClose()">Cancel</button>
+        &nbsp;
+        <button type="button" class="k-button k-primary" (click)="submitCreateForumDiscussion()">OK</button>
+      </div>
+    </form>
+  </kendo-window>
+</div>
+
+<!-- Create Forum Discussion Dialog -->

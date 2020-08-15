@@ -55,7 +55,7 @@ export class DataService {
   httpGet(url: string): Observable<any> {
     return this.httpClient.get<any[]>(url).pipe(
       map((result: any) => {
-        return result.hasOwnProperty('value') ? result.value : result;
+        return result.hasOwnProperty('courses') ? result.courses : result;
       }),
       catchError(this.handleErrorNoMsg));
   }
@@ -64,6 +64,25 @@ export class DataService {
     let apiCallUrl = Url.addParam(environment.moodleEndPoint, "wstoken", environment.moodleWsToken);
     apiCallUrl = Url.addParam(apiCallUrl, "wsfunction", environment.moodleWsFuncGetCourseCategories);
     apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
+
+    return this.httpGet(apiCallUrl);
+  }
+
+  getCourses(): Observable<any[]> {
+    let apiCallUrl = Url.addParam(environment.moodleEndPoint, "wstoken", environment.moodleWsToken);
+    apiCallUrl = Url.addParam(apiCallUrl, "wsfunction", environment.moodleWsFuncGetCourses);
+    apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
+
+    return this.httpGet(apiCallUrl);
+  }
+
+  getCourseForums(course?: any): Observable<any[]> {
+    let apiCallUrl = Url.addParam(environment.moodleEndPoint, "wstoken", environment.moodleWsToken);
+    apiCallUrl = Url.addParam(apiCallUrl, "wsfunction", environment.moodleWsFuncGetForums);
+    apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
+    if (course != null) {
+      apiCallUrl = Url.addParam(apiCallUrl, "courseids[0]", Number(course.id));
+    }
 
     return this.httpGet(apiCallUrl);
   }

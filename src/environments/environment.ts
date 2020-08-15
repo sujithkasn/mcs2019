@@ -14,9 +14,9 @@ export const environment = {
   moodleWsFuncGetForums: 'mod_forum_get_forums_by_courses',
   moodleWsFuncForumAddDiscussion: 'mod_forum_add_discussion',
   moodleWsFuncForumAddDiscussionPost: 'mod_forum_add_discussion_post',
-  moodleWsCourseCategoryId: 13,
-  moodleWsForumId: 43,
-  moodleWsDiscussionId: 87,
+  // moodleWsCourseCategoryId: 13,
+  // moodleWsForumId: 43,
+  // moodleWsDiscussionId: 87,
 };
 
 /*

@@ -20,12 +20,9 @@ export class EditorComponent implements OnInit {
   kendoEditorForm: FormGroup;
   submitted = false;
 
-  // libraries = ['', 'Boilerpipe', 'BoilerPy3', 'Readability', 'Readability+BeautifulSoup'];
   libraries = ['', 'Readability', 'Boilerpipe', 'Newspaper'];
   noExtractors = ['N/A'];
   boilerpipeExtractors = ['', 'Default Extractor', 'Article Extractor', 'Largest Content Extractor', 'Keep Everything Extractor'];
-  // boilerPy3Extractors = ['', 'Default Extractor', 'Article Extractor', 'Article Sentences Extractor', 'Largest Content Extractor', 'Canola Extractor', 'Keep Everything Extractor', 'Num Words Rules Extractor'];
-  // outputFormats = ['', 'HTML', 'HTML Fragment', 'Text', 'JSON'];
   outputFormats = ['']
   readabilityOutputFormats = ['HTML'];
   boilerpipeOutputFormats = ['', 'HTML', 'HTML Fragment', 'Text', 'JSON'];
@@ -47,16 +44,23 @@ export class EditorComponent implements OnInit {
   extractor = "";
   outputFormat = "";
 
-  categories$: any[] = [];
-  //CreateCourse Dialog
+  //Create Course Dialog
   public createCourseDialogOpened = false;
-  public dataSaved = false;
   public courseCategories$: Observable<any>;
   public courseToCreate = {
     courseName: '',
     courseShortName: '',
     courseCategory: null,
     courseIdNumber: ''
+  };
+
+  //Create Forum Discussion Dialog
+  public createForumDiscussionDialogOpened = false;
+  public courses$: Observable<any>;
+  public courseForums$: Observable<any>;
+  public forumDiscussionToCreate = {
+    course: null,
+    forum: null
   };
 
   constructor(private formBuilder: FormBuilder, private dataService: DataService) { }
@@ -96,7 +100,6 @@ export class EditorComponent implements OnInit {
         this.extractors = this.boilerpipeExtractors;
         this.outputFormats = this.boilerpipeOutputFormats;
         this.registerForm.controls['extractor'].setValue(this.extractors[1]);
-        // this.registerForm.controls['outputFormat'].setValue(this.outputFormats[1]);
         break;
 
       case 'Newspaper':
@@ -105,11 +108,6 @@ export class EditorComponent implements OnInit {
         this.registerForm.controls['extractor'].setValue(this.extractors[0]);
         this.registerForm.controls['outputFormat'].setValue(this.outputFormats[0]);
         break;
-
-      // case 'BoilerPy3':
-      //   this.extractors = this.boilerPy3Extractors;
-      //   this.registerForm.controls['extractor'].setValue(this.extractors[1]);
-      //   break;
 
       case '':
         this.extractors = [];
@@ -123,16 +121,10 @@ export class EditorComponent implements OnInit {
   onSubmit() {
     this.submitted = true;
 
-    // stop here if form is invalid
-    // if (this.registerForm.invalid) {
-    //   return;
-    // }
-
     this.url = this.registerForm.controls['url'].value;
     this.library = this.registerForm.controls['library'].value;
     this.extractor = this.registerForm.controls['extractor'].value;
     this.outputFormat = this.registerForm.controls['outputFormat'].value;
-    debugger
 
     this.dataService.postDataWithParams(environment.extractorEndPoint, {
       "url": this.url,
@@ -154,32 +146,34 @@ export class EditorComponent implements OnInit {
       this.displayEditor = true;
       this.displayDataExtraction = false;
       this.displaySuccessTranfer = false;
-      // this.kendoEditorForm.controls['kendoEditor'].updateValueAndValidity({ onlySelf: true, emitEvent: true });
     }).finally(() => {
       this.displayEditor = true;
       this.displayDataExtraction = false;
       this.displaySuccessTranfer = false;
     });
-    // this.valueChange(this.kendoEditorForm.controls['kendoEditor'].value);
   }
 
-  onClickBack(step: number) {
+  onClickBack(step?: number) {
     if (step == 0) {
       this.displayDataExtraction = true;
       this.displayEditor = false;
-      this.displaySuccessTranfer = false;
-      this.transferMessage = '';
-      this.createdItem = '';
     } else if (step == 1) {
       this.displayDataExtraction = false;
       this.displayEditor = true;
-      this.displaySuccessTranfer = false;
-      this.transferMessage = '';
-      this.createdItem = '';
     }
+    this.displaySuccessTranfer = false;
+    this.tranferError = '';
+    this.transferMessage = '';
+    this.createdItem = '';
   }
 
   public onCreateCourseDialogOpen() {
+    this.courseToCreate = {
+      courseName: '',
+      courseShortName: '',
+      courseCategory: null,
+      courseIdNumber: ''
+    };
     this.createCourseDialogOpened = true;
     this.createdItem = "Course";
     of(this.dataService.getCourseCategories()).subscribe(categories => {
@@ -187,46 +181,44 @@ export class EditorComponent implements OnInit {
     });
   }
 
-  public submit() {
-    this.dataSaved = true;
+  public submitCreateCourse() {
     const { courseName, courseShortName, courseCategory, courseIdNumber } = this.courseToCreate;
     this.createCourse(courseName, courseShortName, courseCategory.id, Number(courseIdNumber));
   }
 
   public onCreateCourseDialogClose() {
     this.createCourseDialogOpened = false;
-    this.onClickBack(0);
+    this.onClickBack();
   }
 
-  // onClickCreateCourse() {
-  //   this.createCourseOpened = true;
-  //   // TODO: To be replaced from the input from front end
-  //   // let courseName = "DEMO Course 2"
-  //   // let courseShortName = "DEMO 2"
-  //   // let courseIdNumber = 2
-  //   // this.createdItem = "Course";
-  //   // this.createCourse(courseName, courseShortName, environment.moodleWsCourseCategoryId, courseIdNumber);
-  // }
-
-  onClickAddDiscussion() {
+  public createForumDiscussionDialogOpen() {
+    this.forumDiscussionToCreate = {
+      course: null,
+      forum: null
+    };
+    this.createForumDiscussionDialogOpened = true;
     this.createdItem = "Forum Discussion";
-    this.addDiscussion();
+    of(this.dataService.getCourses()).subscribe(courses => {
+      this.courses$ = courses;
+    });
+    this.onCourseChange();
   }
 
-  onClickAddDiscussionPost() {
-    this.createdItem = "Discussion Post";
-    this.addDiscussionPost();
+  public onCourseChange() {
+    of(this.dataService.getCourseForums(this.forumDiscussionToCreate.course)).subscribe(courseForums => {
+      this.courseForums$ = courseForums;
+    });
   }
 
-  // onClickAddNewWikiPage() {
-  // this.createdItem = "New Wiki Page";
+  public submitCreateForumDiscussion() {
+    const { course, forum } = this.forumDiscussionToCreate;
+    this.createForumDiscussion(Number(this.forumDiscussionToCreate.forum.id));
+  }
 
-  // }
-
-  // onClickAddContentToWikiPage() {
-  // this.createdItem = "Wiki page content";
-
-  // }
+  public onCreateForumDiscussionDialogClose() {
+    this.createForumDiscussionDialogOpened = false;
+    this.onClickBack();
+  }
 
   createCourse(courseName: string, courseShortName: string, courseCategoryId: number, courseIdNumber: number) {
     let apiCallUrl = Url.addParam(environment.moodleEndPoint, "wstoken", environment.moodleWsToken);
@@ -244,68 +236,59 @@ export class EditorComponent implements OnInit {
       }
       else if (res[0]) {
         this.tranferError = ''
-        this.transferMessage = 'New Course: ' + res[0].id + ' with Short name ' + res[0].shortname + 'has been successfully created...!';
-        this.displaySuccessTranfer = true;
-        this.displayEditor = false;
-        this.displayDataExtraction = false;
+        this.transferMessage = 'New Course: \"' + res[0].id + '\" with Short name \"' + res[0].shortname + '\" has been created successfully.';
       }
     });
   }
 
-  addDiscussion() {
+  createForumDiscussion(forumId: number) {
     let apiCallUrl = Url.addParam(environment.moodleEndPoint, "wstoken", environment.moodleWsToken);
     apiCallUrl = Url.addParam(apiCallUrl, "wsfunction", environment.moodleWsFuncForumAddDiscussion);
     apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
-    // TODO: To be replaced from the input from front end
-    apiCallUrl = Url.addParam(apiCallUrl, "forumid", environment.moodleWsForumId);
+    apiCallUrl = Url.addParam(apiCallUrl, "forumid", forumId);
     apiCallUrl = Url.addParam(apiCallUrl, "subject", encodeURIComponent(this.title));
     apiCallUrl = Url.addParam(apiCallUrl, "message", encodeURIComponent(this.content));
 
     this.dataService.postDataWithParams(apiCallUrl).then(res => {
       if (res.exception) {
-        this.tranferError = res.message;
-        this.transferMessage = res.exception + ' - ' + res.errorcode + ' - ' + res.message;
+        this.tranferError = res.exception;
+        this.transferMessage = res.message;
       }
       else if (res) {
         this.tranferError = ''
-        this.transferMessage = 'Forum Discussion: ' + res.discussionid + ' has been successfully added...!';
+        this.transferMessage = 'Forum Discussion: \"' + res.discussionid + '\" has been created successfully.';
       }
-      this.displaySuccessTranfer = true;
-      this.displayEditor = false;
-      this.displayDataExtraction = false;
     });
   }
 
 
-  addDiscussionPost() {
-    // this.categories$ = this.dataService.getCourseCategories();
-    // this.categories$ = this.getOrders();
-    this.displaySuccessTranfer = true;
-    this.displayEditor = false;
-    this.displayDataExtraction = false;
-    console.log(this.categories$);
-    // return;
+  // addDiscussionPost(discussionPostId: number) {
+  //   let apiCallUrl = Url.addParam(environment.moodleEndPoint, "wstoken", environment.moodleWsToken);
+  //   apiCallUrl = Url.addParam(apiCallUrl, "wsfunction", environment.moodleWsFuncForumAddDiscussionPost);
+  //   apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
+  //   apiCallUrl = Url.addParam(apiCallUrl, "postid", discussionPostId);
+  //   apiCallUrl = Url.addParam(apiCallUrl, "subject", encodeURIComponent(this.title));
+  //   apiCallUrl = Url.addParam(apiCallUrl, "message", encodeURIComponent(this.content));
 
-    let apiCallUrl = Url.addParam(environment.moodleEndPoint, "wstoken", environment.moodleWsToken);
-    apiCallUrl = Url.addParam(apiCallUrl, "wsfunction", environment.moodleWsFuncForumAddDiscussionPost);
-    apiCallUrl = Url.addParam(apiCallUrl, "moodlewsrestformat", environment.moodleWsRestFormat);
-    apiCallUrl = Url.addParam(apiCallUrl, "postid", environment.moodleWsDiscussionId);
-    // TODO: To be replaced from the input from front end
-    apiCallUrl = Url.addParam(apiCallUrl, "subject", encodeURIComponent('DEMO Forum Discussion Post'));
-    apiCallUrl = Url.addParam(apiCallUrl, "message", encodeURIComponent(this.content));
+  //   this.dataService.postDataWithParams(apiCallUrl).then(res => {
+  //     if (res.exception) {
+  //       this.tranferError = res.exception;
+  //       this.transferMessage = res.message;
+  //     }
+  //     else if (res) {
+  //       this.tranferError = ''
+  //       this.transferMessage = 'Forum Discussion post: ' + res.postid + ' has been added successfully.';
+  //     }
+  //     this.displaySuccessTranfer = true;
+  //     this.displayEditor = false;
+  //     this.displayDataExtraction = false;
+  //   })
+  // }
 
-    this.dataService.postDataWithParams(apiCallUrl).then(res => {
-      if (res.exception) {
-        this.tranferError = res.message;
-        this.transferMessage = res.exception + ' - ' + res.errorcode + ' - ' + res.message;
-      }
-      else if (res) {
-        this.tranferError = ''
-        this.transferMessage = 'Forum Discussion post: ' + res.postid + ' has been successfully added...!';
-      }
-      this.displaySuccessTranfer = true;
-      this.displayEditor = false;
-      this.displayDataExtraction = false;
-    })
-  }
+  // onClickAddNewWikiPage() {
+  // this.createdItem = "New Wiki Page";
+  // }
+  // onClickAddContentToWikiPage() {
+  // this.createdItem = "Wiki page content";
+  // }
 }
