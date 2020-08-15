@@ -53,6 +53,7 @@ export class EditorComponent implements OnInit {
     courseCategory: null,
     courseIdNumber: ''
   };
+  public courseUrl = '';
 
   //Create Forum Discussion Dialog
   public createForumDiscussionDialogOpened = false;
@@ -62,6 +63,7 @@ export class EditorComponent implements OnInit {
     course: null,
     forum: null
   };
+  public forumDiscussionUrl = '';
 
   constructor(private formBuilder: FormBuilder, private dataService: DataService) { }
 
@@ -237,6 +239,7 @@ export class EditorComponent implements OnInit {
       else if (res[0]) {
         this.tranferError = ''
         this.transferMessage = 'New Course: \"' + res[0].id + '\" with Short name \"' + res[0].shortname + '\" has been created successfully.';
+        this.courseUrl = environment.moodleCourseUrl + res[0].id;
       }
     });
   }
@@ -257,7 +260,12 @@ export class EditorComponent implements OnInit {
       else if (res) {
         this.tranferError = ''
         this.transferMessage = 'Forum Discussion: \"' + res.discussionid + '\" has been created successfully.';
+        this.forumDiscussionUrl = environment.moodleForumDiscussionUrl + res.discussionid;
       }
+    }).catch(error => {
+      this.tranferError = error.exception;
+      this.transferMessage = 'Request URI Too Long';
+      console.log(error)
     });
   }
 
