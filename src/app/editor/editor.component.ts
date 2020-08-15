@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { environment } from 'src/environments/environment';
 import { Url } from '../util/util';
-import { stringify } from 'querystring';
 import { DataService } from '../services/data.service';
 import { Observable, of } from 'rxjs';
 
@@ -143,8 +142,10 @@ export class EditorComponent implements OnInit {
       }
 
       this.contentForm.controls['title'].setValue(this.title);
-      this.kendoEditorForm.controls['kendoEditor'].setValue(res.content);
-      this.content = res.content;
+      // Setting original blog page as the reference 
+      this.content = res.content + "\n" + "<p><strong>Reference:</strong> <a href=" + this.url + " target=\"_blank\" title="+ this.url  +">" + this.url + "</a></p>";
+      this.kendoEditorForm.controls['kendoEditor'].setValue(this.content);
+
       this.displayEditor = true;
       this.displayDataExtraction = false;
       this.displaySuccessTranfer = false;
@@ -185,7 +186,8 @@ export class EditorComponent implements OnInit {
 
   public submitCreateCourse() {
     const { courseName, courseShortName, courseCategory, courseIdNumber } = this.courseToCreate;
-    this.createCourse(courseName, courseShortName, courseCategory.id, Number(courseIdNumber));
+    let categoryId = courseCategory ? courseCategory.id : '';
+    this.createCourse(courseName, courseShortName, categoryId, Number(courseIdNumber));
   }
 
   public onCreateCourseDialogClose() {
@@ -214,7 +216,8 @@ export class EditorComponent implements OnInit {
 
   public submitCreateForumDiscussion() {
     const { course, forum } = this.forumDiscussionToCreate;
-    this.createForumDiscussion(Number(this.forumDiscussionToCreate.forum.id));
+    let forumId = forum ? forum.id : '-1';
+    this.createForumDiscussion(Number(forumId));
   }
 
   public onCreateForumDiscussionDialogClose() {
@@ -241,6 +244,10 @@ export class EditorComponent implements OnInit {
         this.transferMessage = 'New Course: \"' + res[0].id + '\" with Short name \"' + res[0].shortname + '\" has been created successfully.';
         this.courseUrl = environment.moodleCourseUrl + res[0].id;
       }
+    }).catch(error => {
+      this.tranferError = error.exception;
+      this.transferMessage = error.message;
+      console.log(error)
     });
   }
 
@@ -264,11 +271,10 @@ export class EditorComponent implements OnInit {
       }
     }).catch(error => {
       this.tranferError = error.exception;
-      this.transferMessage = 'Request URI Too Long';
+      this.transferMessage = error.message;
       console.log(error)
     });
   }
-
 
   // addDiscussionPost(discussionPostId: number) {
   //   let apiCallUrl = Url.addParam(environment.moodleEndPoint, "wstoken", environment.moodleWsToken);
@@ -299,4 +305,5 @@ export class EditorComponent implements OnInit {
   // onClickAddContentToWikiPage() {
   // this.createdItem = "Wiki page content";
   // }
+
 }
