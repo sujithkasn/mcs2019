@@ -1,13 +1,20 @@
 export const environment = {
   production: false,
   extractorEndPoint: 'http://localhost:8000/demo/extract_content_api/',
+  moodleBaseUrl: 'http://cmbgseapp1636/moodle/',
   moodleEndPoint:'http://cmbgseapp1636/moodle/webservice/rest/server.php',
   moodleWsToken: '38091c6777f2ac297655b12c1fba35e7',
   moodleWsRestFormat: 'json',
+  moodleWsFuncGetCourseCategories: 'core_course_get_categories',
   moodleWsFuncCreateCourse: 'core_course_create_courses',
+  moodleWsFuncGetCourses: 'core_course_get_courses_by_field',
+  moodleWsFuncGetForums: 'mod_forum_get_forums_by_courses',
   moodleWsFuncForumAddDiscussion: 'mod_forum_add_discussion',
   moodleWsFuncForumAddDiscussionPost: 'mod_forum_add_discussion_post',
-  moodleWsCourseCategoryId: 13,
-  moodleWsForumId: 8,
-  moodleWsDiscussionId: 16,
+  moodleCourseUrl: 'http://cmbgseapp1636/moodle/course/view.php?id=',
+  moodleForumDiscussionUrl: 'http://cmbgseapp1636/moodle/mod/forum/discuss.php?d=',
+  
+  // moodleWsCourseCategoryId: 13,
+  // moodleWsForumId: 43,
+  // moodleWsDiscussionId: 87,
 };
